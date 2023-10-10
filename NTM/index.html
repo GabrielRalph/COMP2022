@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <div class = "count row">
+      <div>Itterations: </div> <div id = "count">0</div>
+    </div>
+    <div class = "tapes">
+
+    </div>
+    <div class = "input">
+      <textarea id = "tm" name="name" rows="20" cols="70">
+; initial state is 0
+; input alphabet is {a,b}
+0 a a R 0
+0 b b R 0
+0 a A L 1
+
+1 * * L 1
+1 _ _ R 2
+
+2 A A R 4
+2 a _ R 2a
+
+2a * * R 2a
+2a A A R 2A
+2A A A R 2A
+2A a A L 1
+
+2 b _ R 2b
+2b * * R 2b
+2b A A R 2B
+2B A A R 2B
+2B b A L 1
+
+4 A A R 4
+4 _ * * halt-accept</textarea>
+      <div class = "row ibox1"><input value = "aaa" id = "text"  /><div onclick = "run()" class = "btn">run</div></div>
+      <div class = "row ibox2"><div onclick = "step()" class = "btn">step</div><div onclick = "exit()" class = "btn">exit</div><div onclick = "complete()" class = "btn">complete</div></div>
+    </div>
+  </body>
+
+ <script type="module">
+    import {TM, Tape, simulate} from "./turing.js"
+
+    let tm_t = localStorage.getItem("tm");
+    if (tm_t) {
+      let tm = document.querySelector("#tm");
+      tm.value = tm_t;
+    }
+
+    let text_t = localStorage.getItem("text");
+    if (text_t) {
+      let text = document.querySelector("#text");
+      text.value = text_t;
+    }
+
+
+
+    let inputbox = document.querySelector(".input");
+    let tapes = document.querySelector(".tapes");
+
+    let itt = document.querySelector("#count");
+    let next_step = null;
+    function run(){
+      document.body.toggleAttribute("accept", false);
+      document.body.toggleAttribute("reject", false);
+      tapes.style.setProperty("margin-bottom", (inputbox.clientHeight + 15) + "px")
+      let text = document.querySelector("#text").value;
+      let tm = document.querySelector("#tm").value;
+      localStorage.setItem("tm", tm);
+      localStorage.setItem("text", text);
+
+      console.log(tm, text);
+      let sim_next = null;
+      try {
+        sim_next = simulate(tm, text);
+      } catch (e) {
+        alert(`Error parsing TM\n${e}`);
+        return;
+      }
+
+      next_step = () => {
+        try {
+          let [ss, i, accept, cont] = sim_next();
+          let html = "";
+          for (let [state, t] of ss) {
+            t.log(state);
+            html += t.getHtml(state);
+          }
+          itt.innerHTML = i;
+          tapes.innerHTML = html;
+          console.log(cont);
+          if (!cont) {
+            inputbox.toggleAttribute("running", false)
+            document.body.toggleAttribute("accept", accept);
+            document.body.toggleAttribute("reject", !accept);
+          }
+          return cont;
+        } catch(e) {
+          alert("An error occured");
+          console.log(e);
+          inputbox.toggleAttribute("running", false)
+
+          return false;
+        }
+      }
+      inputbox.toggleAttribute("running", true)
+
+      next_step();
+    }
+    function complete() {
+      let cont = true;
+      while(cont){
+        cont = next_step()
+      }
+    }
+    function exit(){
+      next_step = null;
+      inputbox.toggleAttribute("running", false)
+    }
+    window.run = run;
+    window.exit = exit;
+    window.complete = complete;
+    window.step = () => next_step();
+  </script>
+
+  <style>
+    body {
+      font-family: monospace;
+      --c1: #36261e;
+      --c2: #f3e8e3;
+      --b1: 2px;
+      --b2: 2px;
+    }
+    body[accept]{
+      --c2: #c2e8c0;
+    }
+    body[reject]{
+      --c2: #e8c4c0;
+    }
+    textarea {
+      width: calc(100% - 4*var(--b1));
+      padding: var(--b1);
+      resize: none;
+      border-radius: 5px;
+      border: var(--b1) solid var(--c1);
+    }
+    input {
+      border-radius: 5px;
+      border: var(--b1) solid var(--c1);
+      outline: none;
+    }
+    .count {
+      border: var(--b2) solid var(--c1);
+      border-radius: 5px;
+      background: var(--c2);
+      display: inline-block;
+      padding-left: 0.5em;
+      margin-bottom: 0.5em;
+    }
+    .btn {
+      cursor: pointer;
+      background: var(--c1);
+      color: white;
+      border-radius: 5px;
+      padding: 0 0.5em;
+      line-height: 1.5em;
+      margin: 0 0.5em;
+    }
+    .row { display: flex;}
+    .input {
+      position: fixed;
+      bottom: 0;
+      margin: 10px;
+      left: 0;
+      right: 0;
+    }
+    .input[running] .ibox1 {
+      display: none;
+    }
+    .input:not([running]) .ibox2 {
+      display: none;
+    }
+    .tapes {
+      width: 100%;
+      --ts: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-family: monospace;
+
+
+    }
+    .tape {
+      position: relative;
+      height: calc(var(--ts));
+      background: var(--c2);
+      border: var(--b2) solid var(--c1);
+      border-radius: 5px;
+    }
+    .tape-ref-pos {
+      position: absolute;
+      height: var(--ts);
+      top: 0;
+      left: 50%;
+    }
+    .tape-ref {
+      position:relative;
+    }
+    .t-cell[head] {
+      background: var(--c1);
+      color: white;
+    }
+
+    *[state="halt-reject"] .tape-state{
+      color: red;
+    }
+    *[state="halt-accept"] .tape-state{
+      color: green;
+    }
+    .tape-state {
+      position: absolute;
+      left: 5px;
+      line-height: var(--ts);
+    }
+
+    .t-cell {
+      --x: 0;
+      font-size: calc(0.8*var(--ts));
+      text-align: center;
+      line-height: calc(var(--ts));
+      width: calc(var(--ts));
+      height: calc(var(--ts));
+      position: absolute;
+      transform: translate(-50%, 0);
+      left: calc(var(--x) * var(--ts));
+    }
+  </style>
+</html>
