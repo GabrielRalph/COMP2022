@@ -176,13 +176,10 @@ export class TM{
   getRules(state, headvalue) {
     let rules = [];
     if (state in this.rules) {
-      if (headvalue != "_") {
-        if ("*" in this.rules[state]) {
-          rules = [...rules, ...this.rules[state]["*"]];
-        }
-      }
       if (headvalue in this.rules[state]) {
-        rules = [...rules, ...this.rules[state][headvalue]];
+        rules = this.rules[state][headvalue];
+      } else  if ("*" in this.rules[state]) {
+        rules = this.rules[state]["*"];
       }
 
 
