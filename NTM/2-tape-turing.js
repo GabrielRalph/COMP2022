@@ -25,21 +25,25 @@ export class TM2T{
   getRule(state, h1, h2) {
     let rule = null;
     if (state in this.rules) {
-      if (h1 in this.rules[state]) {
-        rule = this.rules[state][h1];
-      } else  if ("*" in this.rules[state]) {
-        rule = this.rules[state]["*"];
-      }
+      rule = this.rules[state]
+    } else if ("*" in this.rules) {
+      rule = this.rules["*"]
+    } else {
+      return null;
+    }
 
-      if (rule != null) {
-        if (h2 in rule) {
-          rule = rule[h2];
-        } else if ("*" in rule) {
-          rule = rule["*"];
-        } else {
-          rule = null;
-        }
-      }
+    if (h1 in rule) {
+      rule = rule[h1];
+    } else  if ("*" in rule) {
+      rule = rule["*"];
+    } else {
+      return null;
+    }
+
+    if (h2 in rule) {
+      rule = rule[h2];
+    } else if ("*" in rule) {
+      rule = rule["*"];
     }
     return rule;
   }

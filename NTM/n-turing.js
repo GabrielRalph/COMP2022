@@ -24,14 +24,21 @@ export class TM{
   getRules(state, headvalue) {
     let rules = [];
     if (state in this.rules) {
-      if (headvalue in this.rules[state]) {
-        rules = this.rules[state][headvalue];
-      } else  if ("*" in this.rules[state]) {
-        rules = this.rules[state]["*"];
-      }
-
-
+      rules = this.rules[state];
+    } else if ("*") {
+      rules = this.rules["*"]
+    } else {
+      return [];
     }
+
+    if (headvalue in rules) {
+      rules = rules[headvalue];
+    } else  if ("*" in rules) {
+      rules = rules["*"];
+    } else {
+      return [];
+    }
+
     return rules;
   }
 }
