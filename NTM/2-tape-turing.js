@@ -86,6 +86,13 @@ function isAccept(s){
   return !!s.match("halt-accept");
 }
 
+
+/* Simulate, given a turing machine as a string and input string returns
+   an itterate that simulates each step of the simulation.
+   The itterater will return an array containing the state space, i.e. state
+   and both tapes, itteration count, whether the input has been accepted or
+   rejected and a boolean of wheather the simulation is still running.
+*/
 export function simulate(tm, str){
   // Create the two tapes
   let tape1 = new Tape(str);
