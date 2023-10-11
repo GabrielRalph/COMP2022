@@ -94,7 +94,8 @@ function isAccept(s){
    rejected and a boolean of wheather the simulation is still running.
 */
 export function simulate(tm, str, str2 = "_"){
-  if (str == "") str = "_"
+  if (str2 == "" || str2.length == 0) str2 = "_"
+  if (str == "" || str.length == 0) str = "_"
   // Create the two tapes
   let tape1 = new Tape(str);
   let tape2 = new Tape(str2);
