@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>NTM</title>
+    <title>TM 2 Tape</title>
     <link href = "../tape-style.css" rel = "stylesheet"></link>
   </head>
   <body>
@@ -13,32 +13,7 @@
 
     </div>
     <div class = "input">
-      <textarea id = "tm" name="name" rows="20" cols="70">
-; initial state is 0
-; input alphabet is {a,b}
-0 a a R 0
-0 b b R 0
-0 a A L 1
-
-1 * * L 1
-1 _ _ R 2
-
-2 A A R 4
-2 a _ R 2a
-
-2a * * R 2a
-2a A A R 2A
-2A A A R 2A
-2A a A L 1
-
-2 b _ R 2b
-2b * * R 2b
-2b A A R 2B
-2B A A R 2B
-2B b A L 1
-
-4 A A R 4
-4 _ * * halt-accept</textarea>
+      <textarea id = "tm" name="name" rows="20" cols="70"></textarea>
       <div class = "row ibox1"><input value = "babbaababba" id = "text"  /><div onclick = "run()" class = "btn">run</div></div>
       <div class = "row ibox2">
           <div onclick = "step()" class = "btn">step</div>
@@ -50,42 +25,36 @@
   </body>
 
  <script type="module">
-    import {simulate} from "./turing.js"
-
-    let tm_t = localStorage.getItem("tm");
-    if (tm_t) {
-      let tm = document.querySelector("#tm");
-      tm.value = tm_t;
-    }
-
-    let text_t = localStorage.getItem("text");
-    if (text_t) {
-      let text = document.querySelector("#text");
-      text.value = text_t;
-    }
-
-
+    import {simulate, TM2T} from "./2-tape-turing.js"
 
     let inputbox = document.querySelector(".input");
+    let tm_input = document.querySelector("#tm");
+    let text_input = document.querySelector("#text");
     let tapes = document.querySelector(".tapes");
-
     let itt = document.querySelector("#count");
+
+    let tm_t = localStorage.getItem("tm");
+    let text_t = localStorage.getItem("text");
+    if (tm_t) tm.value = tm_t;
+    if (text_t) text.value = text_t;
+
+    // console.log();
+
     let next_step = null;
     function run(){
       document.body.toggleAttribute("accept", false);
       document.body.toggleAttribute("reject", false);
       tapes.style.setProperty("margin-bottom", (inputbox.clientHeight + 15) + "px")
-      let text = document.querySelector("#text").value;
-      let tm = document.querySelector("#tm").value;
+      let text = text_input.value;
+      let tm = tm_input.value;
       localStorage.setItem("tm", tm);
       localStorage.setItem("text", text);
 
-      console.log(tm, text);
       let sim_next = null;
       try {
         sim_next = simulate(tm, text);
       } catch (e) {
-        alert(`Error parsing TM\n${e}`);
+        alert(`Error parsing TM 2 Tape\n${e}`);
         return;
       }
 
@@ -94,13 +63,11 @@
         try {
           let [ss, i, accept, cont] = sim_next();
           let html = "";
-          for (let [state, t] of ss) {
-            t.log(state);
-            html += t.getHtml(state);
-          }
+          let [state, t1, t2] = ss;
+          t1.log(state);
+          t2.log(state);
           itt.innerHTML = i;
-          tapes.innerHTML = html;
-          console.log(cont);
+          tapes.innerHTML = t1.getHtml(state) + t2.getHtml("");
           if (!cont) {
             inputbox.toggleAttribute("running", false)
             document.body.toggleAttribute("accept", accept);

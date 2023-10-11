@@ -1,0 +1,81 @@
+:root {
+  font-family: monospace;
+  --c1: #36261e;
+  --c2: #f3e8e3;
+  --b1: 2px;
+  --b2: 2px;
+}
+*[accept]{
+  --c2: #c2e8c0;
+}
+*[reject]{
+  --c2: #e8c4c0;
+}
+
+.count {
+  border: var(--b2) solid var(--c1);
+  border-radius: 5px;
+  background: var(--c2);
+  display: inline-block;
+  padding-left: 0.5em;
+  margin-bottom: 0.5em;
+  font-family: monospace;
+}
+
+.tapes {
+  width: 100%;
+  --ts: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: monospace;
+}
+
+.tape {
+  position: relative;
+  height: calc(var(--ts));
+  background: var(--c2);
+  border: var(--b2) solid var(--c1);
+  border-radius: 5px;
+}
+
+.tape-ref-pos {
+  position: absolute;
+  height: var(--ts);
+  top: 0;
+  left: 50%;
+}
+
+.tape-ref {
+  position:relative;
+}
+.t-cell[head] {
+  background: var(--c1);
+  color: white;
+}
+
+*[state="halt-reject"] .tape-state{
+  color: red;
+}
+
+*[state="halt-accept"] .tape-state{
+  color: green;
+}
+
+.tape-state {
+  position: absolute;
+  left: 5px;
+  line-height: var(--ts);
+}
+
+.t-cell {
+  --x: 0;
+  font-size: calc(0.8*var(--ts));
+  text-align: center;
+  line-height: calc(var(--ts));
+  width: calc(var(--ts));
+  height: calc(var(--ts));
+  position: absolute;
+  transform: translate(-50%, 0);
+  left: calc(var(--x) * var(--ts));
+}
