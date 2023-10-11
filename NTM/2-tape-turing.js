@@ -93,10 +93,11 @@ function isAccept(s){
    and both tapes, itteration count, whether the input has been accepted or
    rejected and a boolean of wheather the simulation is still running.
 */
-export function simulate(tm, str){
+export function simulate(tm, str, str2 = "_"){
+  if (str == "") str = "_"
   // Create the two tapes
   let tape1 = new Tape(str);
-  let tape2 = new Tape("_");
+  let tape2 = new Tape(str2);
   // Create the TM2T object
   tm = new TM2T(tm);
   let state = tm.start;
