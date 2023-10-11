@@ -1,4 +1,8 @@
 export class Tape{
+  /* Constructs doubly linked list with nodes stored in array where node referenes
+     are to the indecies of the nodes in the array. Nodes will never be removed
+     but knew nodes will be added.
+  */
   constructor(text){
     if (text) {
       let nodes = [...text].map((a) => {return {val: a, next: null, last: null}});
@@ -19,6 +23,7 @@ export class Tape{
     }
   }
 
+  // Get and set values of the head
   get value(){
     return this.head.val;
   }
@@ -26,6 +31,9 @@ export class Tape{
     this.head.val = val;
   }
 
+  /* moves the head to the right if the head reaches the end of the linked list
+     then a new node is created with the blank space character
+  */
   next(){
     let next = this.head.next;
     if (next == null) {
@@ -39,6 +47,10 @@ export class Tape{
     this.head = next;
     return this.value;
   }
+
+  /* moves the head to the left if the head reaches the end of the linked list
+     then a new node is created with the blank space character
+  */
   last(){
     let last = this.head.last;
     if (last == null) {
@@ -53,11 +65,16 @@ export class Tape{
     return this.value;
   }
 
+  /* Move takes a value to write and a move direction, it then writes the head
+     value and performs the given move. Moving left if the direction is 'L' and
+     right if direction is 'R' otherwise the head will not move if direction is
+     '*'. If '*' is given as the value to write the head will not write anything
+     and just move.
+  */
   move(write, dir){
     if (write != "*") {
       this.value = write;
     }
-
     if (dir.toUpperCase() == "L") {
       this.last();
     } else if (dir.toUpperCase() == "R") {
@@ -65,6 +82,8 @@ export class Tape{
     }
   }
 
+  /* Returns the leftmost node
+  */
   get start(){
     let n0 = this.nodes[0];
     while (n0.last != null) {
@@ -73,6 +92,8 @@ export class Tape{
     return n0;
   }
 
+  /* Returns the tape as a string
+  */
   toString(){
     let n0 = this.start;
     let str = "";
@@ -84,6 +105,8 @@ export class Tape{
     return str;
   }
 
+  /* Clones the tape and head location
+  */
   clone(){
     let nnodes = this.nodes.map(n => {return {val: n.val, last: n.last, next: n.next, ref: n.ref}})
     let head = nnodes[this.head.ref];
@@ -93,6 +116,9 @@ export class Tape{
     return clone;
   }
 
+  /* Returns the tape as a HTML string, can take a state as parameters
+     and adds that to the display
+  */
   getHtml(state){
     let n0 = this.nodes[0];
     let nodes = ""
@@ -126,6 +152,8 @@ export class Tape{
               </div>`
   }
 
+  /* Console logs the tape using colors to show where the head is
+  */
   log(pre){
     let n0 = this.start;
     let before = "";

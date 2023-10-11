@@ -1,23 +1,36 @@
 import {Tape} from "../tape.js"
 export class TM{
   constructor(text) {
+    // Rules will be a dictionary for which states are keys
     let rules = {}
+
+    // Remove comments and leading whitespace
     let lines = text.replace(/;.*(?=\n)|^\s*/gm, "").split(/\n/);
-    let start = null;
+
+    // For each non empty line in the tm text
     let i =0;
     for (let line of lines) {
       if (!(line == "" || !!line.match(/^\s*$/))) {
+
+        // Split by whitespace characters and throw error if invalid number of
+        // arguments
         let vals = line.split(/\s+/);
         if (vals.length != 5) throw 'invalid number of parameters on line ' + i;
         let [state0, rv, wv, dir, state1] = vals;
-        if (start == null) start = state0;
+
+        // The first state written will be the starting state
+        if (!this.start) this.start = state0;
+
+        // The value in the rules for a given state is a dictionary
+        // for which head values are the keys
         if (!(state0 in rules)) rules[state0] = {};
+        // The value in rules for a state for a head value is an array of
+        // possible consequent moves
         if (!(rv in rules[state0])) rules[state0][rv] = [];
         rules[state0][rv].push({write: wv, move: dir, state: state1});
       }
       i++;
     }
-    this.start = start;
     this.rules = rules;
   }
 
