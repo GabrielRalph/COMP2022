@@ -30,6 +30,7 @@ compare _ * * * * * halt-reject
       </textarea>
       <div class = "row ibox1">
         <input value = "0111100100" id = "text"  />
+        <input value = "0111100100" id = "text2"  />
         <div onclick = "run('ntm')" class = "btn">run ntm</div>
         <div onclick = "run('tm2t')" class = "btn">run tm2t</div>
       </div>
@@ -49,14 +50,17 @@ compare _ * * * * * halt-reject
     let inputbox = document.querySelector(".input");
     let tm_input = document.querySelector("#tm");
     let text_input = document.querySelector("#text");
+    let text2_input = document.querySelector("#text2");
     let tapes = document.querySelector(".tapes");
     let itt = document.querySelector("#count");
 
     // update cookies
     let tm_t = localStorage.getItem("tm");
     let text_t = localStorage.getItem("text");
-    if (tm_t) tm.value = tm_t;
-    if (text_t) text.value = text_t;
+    let text2_t = localStorage.getItem("text2");
+    if (tm_t) tm_input.value = tm_t;
+    if (text_t) text_input.value = text_t;
+    if (text2_t) text2_input.value = text2_t;
 
     const SIMTYPES = {
       ntm: {
@@ -86,16 +90,18 @@ compare _ * * * * * halt-reject
       document.body.toggleAttribute("accept", false);
       document.body.toggleAttribute("reject", false);
       tapes.style.setProperty("margin-bottom", (inputbox.clientHeight + 15) + "px")
+      let text2 = text2_input.value;
       let text = text_input.value;
       let tm = tm_input.value;
       localStorage.setItem("tm", tm);
       localStorage.setItem("text", text);
+      localStorage.setItem("text2", text2);
 
       let simx = SIMTYPES[type];
 
       let sim_next = null;
       try {
-        sim_next = simx.simulate(tm, text);
+        sim_next = simx.simulate(tm, text, text2);
       } catch (e) {
         alert(`Error parsing TM ${type.toUpperCase()}\n${e}`);
         return;
