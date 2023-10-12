@@ -22,12 +22,15 @@ export class TM2T{
     // For each non empty line in the tm text
     let i =0;
     for (let line of lines) {
+      line = line.replace(/\s*$/, "");
+      line = line.replace(/^\s*/, "");
       if (!(line == "" || !!line.match(/^\s*$/))) {
 
         // Split by whitespace characters and throw error if invalid number of
         // arguments
         let vals = line.split(/\s+/);
-        if (vals.length != 8) throw 'invalid number of parameters on line ' + i;
+        console.log(line, vals);
+        if (vals.length != 8) throw 'invalid number of parameters on line ' + i + `"${line}"`;
         let [state0, rh1, rh2, wh1, wh2, mv1, mv2, state1] = vals;
 
         // As per above structure
