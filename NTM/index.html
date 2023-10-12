@@ -43,6 +43,9 @@ compare _ * * * * * halt-reject
             steps:
           </div>
           <input type = "number" value = "1" id = "numsteps"  />
+          <div>
+          </div>
+          <div id = "stats"></div>
         </div>
     </div>
   </body>
@@ -55,6 +58,7 @@ compare _ * * * * * halt-reject
     let tm_input = document.querySelector("#tm");
     let text_input = document.querySelector("#text");
     let text2_input = document.querySelector("#text2");
+    let stats = document.querySelector("#stats");
     let tapes = document.querySelector(".tapes");
     let itt = document.querySelector("#count");
     let numsteps = document.querySelector("#numsteps");
@@ -66,6 +70,15 @@ compare _ * * * * * halt-reject
     if (tm_t) tm_input.value = tm_t;
     if (text_t) text_input.value = text_t;
     if (text2_t) text2_input.value = text2_t;
+
+    // scroll functionality
+    let x = 0;
+    window.addEventListener("wheel", (e) => {
+      x += e.deltaX;
+      tapes.style.setProperty("--tcx", x+"px");
+    })
+
+
 
     const SIMTYPES = {
       ntm: {
@@ -111,6 +124,8 @@ compare _ * * * * * halt-reject
         alert(`Error parsing TM ${type.toUpperCase()}\n${e}`);
         return;
       }
+
+      stats.innerHTML = `#states: ${sim_next.tm.states.length} rules: ${sim_next.tm.ruleCount}`
 
       exited = false;
       next_step = () => {
@@ -169,6 +184,7 @@ compare _ * * * * * halt-reject
   <style>
     body {
       font-family: monospace;
+      overflow-x: hidden;
     }
 
     textarea {
@@ -192,7 +208,11 @@ compare _ * * * * * halt-reject
       padding: 0 0.5em;
       line-height: 1.5em;
     }
-    .row { display: flex; gap: 0.7em;}
+    .row {
+      display: flex;
+      gap: 0.7em;
+      align-items: center;
+    }
     .input {
       position: fixed;
       bottom: 0;

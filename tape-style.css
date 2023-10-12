@@ -4,6 +4,7 @@
   --c2: #f3e8e3;
   --b1: 2px;
   --b2: 2px;
+  --tcx: 0px;
 }
 *[accept]{
   --c2: #c2e8c0;
@@ -37,13 +38,14 @@
   background: var(--c2);
   border: var(--b2) solid var(--c1);
   border-radius: 5px;
+  overflow: hidden;
 }
 
 .tape-ref-pos {
   position: absolute;
   height: var(--ts);
   top: 0;
-  left: 25%;
+  left: calc(25% + var(--tcx));
 }
 
 .tape-ref {

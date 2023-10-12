@@ -20,7 +20,7 @@ export class TM2T{
     let lines = text.replace(/;.*(?=\n)|^\s*/gm, "").split(/\n/);
 
     // For each non empty line in the tm text
-    let i =0;
+    let i,k = 0;
     for (let line of lines) {
       line = line.replace(/\s*$/, "");
       line = line.replace(/^\s*/, "");
@@ -31,17 +31,21 @@ export class TM2T{
         let vals = line.split(/\s+/);
         if (vals.length != 8) throw 'invalid number of parameters on line ' + i + `"${line}"`;
         let [state0, rh1, rh2, wh1, wh2, mv1, mv2, state1] = vals;
+        if (!mv1.match(/[*LRlr]/) || !mv2.match(/[*LRlr]/)) throw 'invalid move ' + line;
 
-        if (!mv1.match(/\*|L|R/) || !mv2.match(/\*|L|R/)) throw 'invalid move ' + line;
         // As per above structure
         if (this.start == null) this.start = state0;
         if (!(state0 in rules)) rules[state0] = {};
         if (!(rh1 in rules[state0])) rules[state0][rh1] = {};
-        rules[state0][rh1][rh2] = {write1: wh1, write2: wh2, move1: mv1, move2: mv2, newstate: state1}
+        rules[state0][rh1][rh2] = {write1: wh1, write2: wh2, move1: mv1, move2: mv2, newstate: state1};
+        k++;
       }
       i++;
     }
     this.rules = rules;
+
+    this.states = Object.keys(rules).filter(a => a != "*");
+    this.ruleCount = k;
   }
 
   getRule(state, h1, h2) {
@@ -78,7 +82,7 @@ export class TM2T{
     } else {
       rule = null;
     }
-    
+
     return rule;
   }
 }
@@ -120,7 +124,7 @@ export function simulate(tm, str, str2 = "_"){
 
     // get the move from the rules given the current state and head values
     let rule = tm.getRule(state, tape1.value, tape2.value);
-    console.log(state, tape1.value, tape2.value, rule);
+
     // If rule exists then move both tapes
     if (rule) {
       let {write1, write2, move1, move2, newstate} = rule;
@@ -135,5 +139,8 @@ export function simulate(tm, str, str2 = "_"){
 
     return [[state, tape1, tape2], i, isAccept(state), !isHalt(state)];
   }
+
+  next.tm = tm;
+
   return next;
 }
