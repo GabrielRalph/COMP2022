@@ -8,7 +8,7 @@ export class TM{
     let lines = text.replace(/;.*(?=\n)|^\s*/gm, "").split(/\n/);
 
     // For each non empty line in the tm text
-    let i =0;
+    let i,k =0;
     for (let line of lines) {
       if (!(line == "" || !!line.match(/^\s*$/))) {
 
@@ -17,6 +17,7 @@ export class TM{
         let vals = line.split(/\s+/);
         if (vals.length != 5) throw 'invalid number of parameters on line ' + i;
         let [state0, rv, wv, dir, state1] = vals;
+        if (!dir.match(/[*LRlr]/)) throw 'invalid move ' + line;
 
         // The first state written will be the starting state
         if (!this.start) this.start = state0;
@@ -28,10 +29,13 @@ export class TM{
         // possible consequent moves
         if (!(rv in rules[state0])) rules[state0][rv] = [];
         rules[state0][rv].push({write: wv, move: dir, state: state1});
+        k++;
       }
       i++;
     }
     this.rules = rules;
+    this.states = Object.keys(rules).filter(a => a != "*");
+    this.ruleCount = k;
   }
 
   getRules(state, headvalue) {
@@ -112,6 +116,6 @@ export function simulate(tm, str) {
 
     return [ss, i, accept, cont];
   }
-
+  next.tm = m;
   return next;
 }
