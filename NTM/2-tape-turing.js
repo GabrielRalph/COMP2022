@@ -29,10 +29,10 @@ export class TM2T{
         // Split by whitespace characters and throw error if invalid number of
         // arguments
         let vals = line.split(/\s+/);
-        console.log(line, vals);
         if (vals.length != 8) throw 'invalid number of parameters on line ' + i + `"${line}"`;
         let [state0, rh1, rh2, wh1, wh2, mv1, mv2, state1] = vals;
 
+        if (!mv1.match(/\*|L|R/) || !mv2.match(/\*|L|R/)) throw 'invalid move ' + line;
         // As per above structure
         if (this.start == null) this.start = state0;
         if (!(state0 in rules)) rules[state0] = {};
@@ -61,7 +61,7 @@ export class TM2T{
     if (h1 in rule) {
       rule = rule[h1];
     // Otherwise if there are rules for the wild card head value 1
-    } else  if ("*" in rule) {
+    } else if ("*" in rule) {
       rule = rule["*"];
     // No rule!
     } else {
@@ -75,7 +75,10 @@ export class TM2T{
     // Otherwise if there are rules for the wild card head value 2
     } else if ("*" in rule) {
       rule = rule["*"];
+    } else {
+      rule = null;
     }
+    
     return rule;
   }
 }
@@ -117,7 +120,7 @@ export function simulate(tm, str, str2 = "_"){
 
     // get the move from the rules given the current state and head values
     let rule = tm.getRule(state, tape1.value, tape2.value);
-
+    console.log(state, tape1.value, tape2.value, rule);
     // If rule exists then move both tapes
     if (rule) {
       let {write1, write2, move1, move2, newstate} = rule;

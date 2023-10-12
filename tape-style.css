@@ -43,7 +43,7 @@
   position: absolute;
   height: var(--ts);
   top: 0;
-  left: 50%;
+  left: 25%;
 }
 
 .tape-ref {
