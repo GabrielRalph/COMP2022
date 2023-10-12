@@ -177,7 +177,8 @@ compare _ * * * * * halt-reject
     window.step = () => {
       let n = parseInt(numsteps.value)
       if (Number.isNaN(n)) n = 1;
-      for (let i = 0; i < n; i++) next_step();
+      let cont = true;
+      for (let i = 0; cont && (i < n); i++) cont = next_step();
     }
   </script>
 
