@@ -31,14 +31,18 @@ compare _ * * * * * halt-reject
       <div class = "row ibox1">
         <input value = "0111100100" id = "text"  />
         <input value = "" id = "text2"  />
-        <div onclick = "run('ntm')" class = "btn">run ntm</div>
         <div onclick = "run('tm2t')" class = "btn">run tm2t</div>
+        <div onclick = "run('ntm')" class = "btn">run ntm</div>
       </div>
       <div class = "row ibox2">
           <div onclick = "step()" class = "btn">step</div>
           <div onclick = "exit()" class = "btn">exit</div>
           <div onclick = "complete()" class = "btn">complete</div>
           <div onclick = "anim()" class = "btn">animate</div>
+          <div>
+            steps:
+          </div>
+          <input type = "number" value = "1" id = "numsteps"  />
         </div>
     </div>
   </body>
@@ -53,6 +57,7 @@ compare _ * * * * * halt-reject
     let text2_input = document.querySelector("#text2");
     let tapes = document.querySelector(".tapes");
     let itt = document.querySelector("#count");
+    let numsteps = document.querySelector("#numsteps");
 
     // update cookies
     let tm_t = localStorage.getItem("tm");
@@ -154,7 +159,11 @@ compare _ * * * * * halt-reject
     window.exit = exit;
     window.complete = complete;
     window.anim = animate;
-    window.step = () => next_step();
+    window.step = () => {
+      let n = parseInt(numsteps.value)
+      if (Number.isNaN(n)) n = 1;
+      for (let i = 0; i < n; i++) next_step();
+    }
   </script>
 
   <style>
