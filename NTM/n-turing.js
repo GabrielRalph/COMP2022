@@ -42,7 +42,7 @@ export class TM{
     let rules = [];
     if (state in this.rules) {
       rules = this.rules[state];
-    } else if ("*") {
+    } else if ("*" in this.rules) {
       rules = this.rules["*"]
     } else {
       return [];

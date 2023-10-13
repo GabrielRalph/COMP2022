@@ -77,7 +77,39 @@ compare _ * * * * * halt-reject
       x += e.deltaX;
       tapes.style.setProperty("--tcx", x+"px");
     })
+    window.addEventListener("keydown", (e) => {
+      if (isInput()) {
+        if (e.key == "Tab") {
+          e.preventDefault();
+          insert('\t');
+        }
+      } else {
+        switch(e.key) {
+          case "s": step(); break;
+          case "c": complete(); break;
+          case "e": exit(); break;
+          case "a": animate(); break;
+          case "1": run("ntm"); break;
+          case "2": run("tm2t"); break;
+        }
+      }
+    })
 
+
+    function isInput(el = document.activeElement) {
+      return (el.tagName == "INPUT" || el.tagName == "TEXTAREA");
+    }
+    function insert(text) {
+      let s = tm_input.selectionStart;
+      let e = tm_input.selectionEnd;
+      console.log(s, e);
+      let value = tm_input.value;
+      value = value.slice(0, s) + text + value.slice(e, value.length);
+      let e2 = s + text.length;
+      tm_input.value = value;
+      tm_input.selectionStart = e2;
+      tm_input.selectionEnd = e2;
+    }
 
 
     const SIMTYPES = {
@@ -104,6 +136,7 @@ compare _ * * * * * halt-reject
     }
 
     let next_step = null;
+    let running = false;
     function run(type){
       document.body.toggleAttribute("accept", false);
       document.body.toggleAttribute("reject", false);
@@ -126,7 +159,6 @@ compare _ * * * * * halt-reject
       }
 
       stats.innerHTML = `#states: ${sim_next.tm.states.length} rules: ${sim_next.tm.ruleCount}`
-
       exited = false;
       next_step = () => {
         try {
@@ -134,6 +166,7 @@ compare _ * * * * * halt-reject
           itt.innerHTML = i;
           simx.render(ss);
           if (!cont) {
+            running = false;
             inputbox.toggleAttribute("running", false)
             document.body.toggleAttribute("accept", accept);
             document.body.toggleAttribute("reject", !accept);
@@ -143,19 +176,23 @@ compare _ * * * * * halt-reject
           alert("An error occured");
           console.log(e);
           inputbox.toggleAttribute("running", false)
+          running = false;
           return false;
         }
       }
+      running = true;
       inputbox.toggleAttribute("running", true)
       next_step();
     }
     function complete() {
+      if (!running) return;
       let cont = true;
       while(cont && !exited){
         cont = next_step()
       }
     }
     async function animate() {
+      if (!running) return;
       let cont = true;
       while(cont && !exited){
         cont = next_step()
@@ -166,26 +203,38 @@ compare _ * * * * * halt-reject
     }
     let exited = false;
     function exit(){
+      if (!running) return;
       exited = true;
       next_step = null;
       inputbox.toggleAttribute("running", false)
     }
-    window.run = run;
-    window.exit = exit;
-    window.complete = complete;
-    window.anim = animate;
-    window.step = () => {
+
+    function step(){
+      if (!running) return;
       let n = parseInt(numsteps.value)
       if (Number.isNaN(n)) n = 1;
       let cont = true;
       for (let i = 0; cont && (i < n); i++) cont = next_step();
     }
+
+    window.run = run;
+    window.exit = exit;
+    window.complete = complete;
+    window.anim = animate;
+    window.step = step;
   </script>
 
   <style>
     body {
       font-family: monospace;
       overflow-x: hidden;
+    }
+
+    textarea,
+    pre {
+        -moz-tab-size : 2;
+          -o-tab-size : 2;
+             tab-size : 2;
     }
 
     textarea {
