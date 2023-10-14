@@ -31,14 +31,14 @@ compare _ * * * * * halt-reject
       <div class = "row ibox1">
         <input value = "0111100100" id = "text"  />
         <input value = "" id = "text2"  />
-        <div onclick = "run('tm2t')" class = "btn">run tm2t</div>
-        <div onclick = "run('ntm')" class = "btn">run ntm</div>
+        <div onclick = "run('tm2t')" key = "2" class = "btn">run tm2t</div>
+        <div onclick = "run('ntm')" key = "1" class = "btn">run ntm</div>
       </div>
       <div class = "row ibox2">
-          <div onclick = "step()" class = "btn">step</div>
-          <div onclick = "exit()" class = "btn">exit</div>
-          <div onclick = "complete()" class = "btn">complete</div>
-          <div onclick = "anim()" class = "btn">animate</div>
+          <div onclick = "step()" key = "s" class = "btn">step</div>
+          <div onclick = "exit()" key = "e" class = "btn">exit</div>
+          <div onclick = "complete()" key = "c" class = "btn">complete</div>
+          <div onclick = "anim()" key = "a" class = "btn">animate </div>
           <div>
             steps:
           </div>
@@ -74,8 +74,11 @@ compare _ * * * * * halt-reject
     // scroll functionality
     let x = 0;
     window.addEventListener("wheel", (e) => {
-      x += e.deltaX;
-      tapes.style.setProperty("--tcx", x+"px");
+      let angle = Math.atan(Math.abs(e.deltaY/e.deltaX))*180/Math.PI;
+      if (angle < 45) {
+        x += e.deltaX;
+        tapes.style.setProperty("--tcx", x+"px");
+      }
     })
     window.addEventListener("keydown", (e) => {
       if (isInput()) {
@@ -107,8 +110,24 @@ compare _ * * * * * halt-reject
       value = value.slice(0, s) + text + value.slice(e, value.length);
       let e2 = s + text.length;
       tm_input.value = value;
+      tm_input.click();
       tm_input.selectionStart = e2;
       tm_input.selectionEnd = e2;
+    }
+    function selectLine(i) {
+      setTimeout(() => {
+        tm_input.focus();
+        tm_input.onfocus = () => {
+          let lines = [...tm_input.value.matchAll("\n")];
+          let si = 0;
+          if (i > 0) {
+            si = lines[i-1].index + 1;
+          }
+          let ei = lines[i].index;
+          tm_input.selectionStart = si;
+          tm_input.selectionEnd = ei;
+        }
+      }, 0)
     }
 
 
@@ -154,6 +173,7 @@ compare _ * * * * * halt-reject
       try {
         sim_next = simx.simulate(tm, text, text2);
       } catch (e) {
+        selectLine(e.line);
         alert(`Error parsing TM ${type.toUpperCase()}\n${e}`);
         return;
       }
@@ -256,8 +276,25 @@ compare _ * * * * * halt-reject
       color: white;
       border-radius: 5px;
       padding: 0 0.5em;
+      padding-bottom: 0.1em;
       line-height: 1.5em;
+      position: relative;
     }
+    .btn:hover::after {
+      display: flex;
+      background: var(--c1);
+      color: white;
+      border-radius: 5px;
+      position: absolute;
+      line-height: 1.5em;
+      padding-bottom: 0.1em;
+      content: ' (' attr(key) ')';
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, calc(-100% - 3px));
+    }
+
+
     .row {
       display: flex;
       gap: 0.7em;

@@ -1,23 +1,26 @@
-import {Tape} from "../tape.js"
+import {Tape, TMParseError, strip} from "../tape.js"
+
+
 export class TM{
   constructor(text) {
     // Rules will be a dictionary for which states are keys
     let rules = {}
 
     // Remove comments and leading whitespace
-    let lines = text.replace(/;.*(?=\n)|^\s*/gm, "").split(/\n/);
+    let lines = text.split(/\n/);
 
     // For each non empty line in the tm text
-    let i,k =0;
+    let [i,k] = [0, 0];
     for (let line of lines) {
+      line = strip(line);
       if (!(line == "" || !!line.match(/^\s*$/))) {
 
         // Split by whitespace characters and throw error if invalid number of
         // arguments
         let vals = line.split(/\s+/);
-        if (vals.length != 5) throw 'invalid number of parameters on line ' + i;
+        if (vals.length != 5) throw new TMParseError(`Invalid parameters`, i);
         let [state0, rv, wv, dir, state1] = vals;
-        if (!dir.match(/[*LRlr]/)) throw 'invalid move ' + line;
+        if (!dir.match(/[*LRlr]/)) throw new TMParseError(`Invalid move ${dir}`, i);
 
         // The first state written will be the starting state
         if (!this.start) this.start = state0;
@@ -66,7 +69,7 @@ function isHalt(s){
   return !!s.match("halt");
 }
 export function simulate(tm, str) {
-
+  if (!str || str.length == 0) str = "_";
   let m = new TM(tm);
 
 
@@ -87,7 +90,7 @@ export function simulate(tm, str) {
         if (!isHalt(state)) {
           let moves = m.getRules(state, t.value);
           if (moves.length == 0) {
-            nss.push(["halt-reject", t])
+            nss.push(["halt", t])
           } else {
             for (let move of moves) {
               let t2 = t.clone();

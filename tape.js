@@ -177,3 +177,17 @@ export class Tape{
     console.log(`${pre? pre + ": ": ""}%c${before}${head}%c${after}`, "color: white", "color: red", "color: white");
   }
 }
+
+export class TMParseError extends Error{
+  constructor(message, line) {
+    super(message);
+    this.line = line;
+  }
+}
+
+export function strip(text) {
+  text = text.replace(/;.*$/, "") // remove comments
+  text = text.replace(/\s*$/, ""); // remove trailing whitespace
+  text = text.replace(/^\s*/, ""); // remove leading whitespace
+  return text;
+}

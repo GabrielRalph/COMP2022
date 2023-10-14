@@ -1,4 +1,4 @@
-import {Tape} from "../tape.js"
+import {Tape, TMParseError, strip} from "../tape.js"
 export class TM2T{
   constructor(text) {
     /* Rules will be an object such that the state of turing machine will be
@@ -17,21 +17,20 @@ export class TM2T{
     let rules = {}
 
     // Remove comments and leading whitespace
-    let lines = text.replace(/;.*(?=\n)|^\s*/gm, "").split(/\n/);
+    let lines = text.split(/\n/);
 
     // For each non empty line in the tm text
-    let i,k = 0;
+    let [i,k] = [0, 0];
     for (let line of lines) {
-      line = line.replace(/\s*$/, "");
-      line = line.replace(/^\s*/, "");
+      line = strip(line);
       if (!(line == "" || !!line.match(/^\s*$/))) {
 
         // Split by whitespace characters and throw error if invalid number of
         // arguments
         let vals = line.split(/\s+/);
-        if (vals.length != 8) throw 'invalid number of parameters on line ' + i + `"${line}"`;
+        if (vals.length != 8) throw new TMParseError(`Invalid parameters`, i);
         let [state0, rh1, rh2, wh1, wh2, mv1, mv2, state1] = vals;
-        if (!mv1.match(/[*LRlr]/) || !mv2.match(/[*LRlr]/)) throw 'invalid move ' + line;
+        if (!mv1.match(/[*LRlr]/) || !mv2.match(/[*LRlr]/)) new TMParseError(`Invalid move`, i);
 
         // As per above structure
         if (this.start == null) this.start = state0;
