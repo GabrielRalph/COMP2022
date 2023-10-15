@@ -92,6 +92,15 @@ export class Tape{
     return n0;
   }
 
+  // returns right most node
+  get end(){
+    let n0 = this.nodes[0];
+    while (n0.next != null) {
+      n0 = this.nodes[n0.next];
+    }
+    return n0;
+  }
+
   /* Returns the tape as a string
   */
   toString(){
@@ -175,6 +184,75 @@ export class Tape{
     }
 
     console.log(`${pre? pre + ": ": ""}%c${before}${head}%c${after}`, "color: white", "color: red", "color: white");
+  }
+}
+
+export class PortalTape extends Tape {
+  /* Move takes a value to write and a move direction, it then writes the head
+     value and performs the given move. Moving left if the direction is 'L' and
+     right if direction is 'R' otherwise the head will not move if direction is
+     '*'. If '*' is given as the value to write the head will not write anything
+     and just move.
+  */
+  move(write, dir){
+    dir = dir.toUpperCase();
+    if (write != "*") {
+      this.value = write;
+    }
+    if (write == "0" && dir != "*") {
+      if (dir == "L") {
+        this.move2leftmost0();
+      } else if (dir == "R"){
+        this.move2rightmost0();
+      }
+    } else {
+      if (dir == "L") {
+        this.last();
+      } else if (dir == "R") {
+        this.next();
+      }
+    }
+  }
+
+  clone(){
+    let nnodes = this.nodes.map(n => {return {val: n.val, last: n.last, next: n.next, ref: n.ref}})
+    let head = nnodes[this.head.ref];
+    let clone = new PortalTape();
+    clone.head = head;
+    clone.nodes = nnodes;
+    return clone;
+  }
+
+  move2leftmost0(){
+    let n = this.head.last;
+    while (n != null && this.nodes[n].val != "0") {
+      n = this.nodes[n].last;
+    }
+
+    if (n == null) {
+      n = this.end.ref;
+      while (n != null && this.nodes[n].val != "0") {
+        n = this.nodes[n].last;
+      }
+    }
+
+    this.head = this.nodes[n];
+  }
+
+  move2rightmost0(){
+    let n = this.head.next;
+    while (n != null && this.nodes[n].val != "0") {
+      n = this.nodes[n].next;
+    }
+
+    if (n == null) {
+      n = this.start.ref;
+      while (n != null && this.nodes[n].val != "0") {
+        n = this.nodes[n].next;
+      }
+    }
+
+    this.head = this.nodes[n];
   }
 }
 

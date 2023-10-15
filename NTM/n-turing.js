@@ -1,4 +1,4 @@
-import {Tape, TMParseError, strip} from "../tape.js"
+import {Tape, PortalTape, TMParseError, strip} from "../tape.js"
 
 
 export class TM{
@@ -68,13 +68,16 @@ export class TM{
 function isHalt(s){
   return !!s.match("halt");
 }
-export function simulate(tm, str) {
+
+
+export function simulate(tm, str, isPortal = false) {
+  let TapeClass = isPortal ? PortalTape : Tape;
   if (!str || str.length == 0) str = "_";
   let m = new TM(tm);
-
+  console.log(TapeClass);
 
   let i = -1;
-  let ss = [[m.start, new Tape(str)]]
+  let ss = [[m.start, new TapeClass(str)]]
   let nh = 1;
 
   let next = () => {

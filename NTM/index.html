@@ -33,6 +33,7 @@ compare _ * * * * * halt-reject
         <input value = "" id = "text2"  />
         <div onclick = "run('tm2t')" key = "2" class = "btn">run tm2t</div>
         <div onclick = "run('ntm')" key = "1" class = "btn">run ntm</div>
+        <div onclick = "run('ptm')" key = "p" class = "btn">run ptm</div>
       </div>
       <div class = "row ibox2">
           <div onclick = "step()" key = "s" class = "btn">step</div>
@@ -94,6 +95,7 @@ compare _ * * * * * halt-reject
           case "a": animate(); break;
           case "1": run("ntm"); break;
           case "2": run("tm2t"); break;
+          case "p": run("ptm"); break;
         }
       }
     })
@@ -133,7 +135,18 @@ compare _ * * * * * halt-reject
 
     const SIMTYPES = {
       ntm: {
-        simulate: NTM.simulate,
+        simulate: (tm, str) => NTM.simulate(tm, str, false),
+        render: (ss) => {
+          let html = "";
+          for (let [state, t] of ss) {
+            t.log(state);
+            html += t.getHtml(state);
+          }
+          tapes.innerHTML = html;
+        }
+      },
+      ptm: {
+        simulate: (tm, str) => NTM.simulate(tm, str, true),
         render: (ss) => {
           let html = "";
           for (let [state, t] of ss) {
@@ -225,6 +238,7 @@ compare _ * * * * * halt-reject
     function exit(){
       if (!running) return;
       exited = true;
+      running = false;
       next_step = null;
       inputbox.toggleAttribute("running", false)
     }
